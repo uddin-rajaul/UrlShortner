@@ -1,0 +1,89 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <title>very tiny</title>
+  </head>
+  <body>
+    <div
+      class="h-screen w-screen bg-[#121212] flex justify-center items-center"
+    >
+      <div
+        class="border-start-start-radius: 0.75rem flex flex-col gap-[1rem] justify-center items-center"
+      >
+        <h1
+          class="text-[2rem] font-bold bg-gradient-to-r from-indigo-500 via-blue-500 to-purple-500 bg-clip-text text-[transparent]"
+        >
+          Small Url
+        </h1>
+        <div class="flex gap-[1rem] items-center">
+          <input
+            id="longUrlInput"
+            type="text"
+            class="bg-[#393c46] text-[1.2rem] rounded-[8px] text-[#fff] outline-none pl-[0.6rem] py-[8px] w-[400px]"
+          />
+          <button
+            id="shortenButton"
+            class="bg-[#fff] text-[#fff] outline-none border-none py-[8px] rounded-[8px] px-[10px] font-bold bg-gradient-to-r from-indigo-500 via-blue-500 to-purple-500"
+          >
+            Shorten
+          </button>
+        </div>
+
+        <a
+          id="resultLink"
+          target="_blank"
+          class="bg-[#393c46] rounded-[8px] px-[10px] px-[10px] text-[1.4rem] text-indigo-500 w-[400px] text-center"
+          href=""
+        ></a>
+        <canvas id="qrcode"></canvas>
+      </div>
+    </div>
+
+    <script>
+      document
+        .getElementById("shortenButton")
+        .addEventListener("click", async () => {
+          const longUrl = document.getElementById("longUrlInput").value;
+          try {
+            const response = await fetch("http://127.0.0.1:8000/create/", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ original_url: longUrl }),
+            });
+            const data = await response.json();
+            if (response.ok) {
+              document.getElementById("resultLink").innerText = data.short_url;
+              document.getElementById("resultLink").href = data.short_url;
+              var qrcode = new QRious({
+                element: document.getElementById("qrcode"),
+                background: "#ffffff",
+                backgroundAlpha: 1,
+                foreground: "#5868bf",
+                foregroundAlpha: 1,
+                level: "H",
+                padding: 10,
+                size: 128,
+                value: data.short_url,
+              });
+            } else {
+              console.error("Failed to shorten URL:", data.error);
+              document.getElementById("resultLink").innerText =
+                "Failed to shorten URL";
+            }
+          } catch (error) {
+            console.error("Failed to connect to server:", error);
+            document.getElementById("resultLink").innerText =
+              "Failed to connect to server";
+          }
+        });
+    </script>
+  </body>
+</html>

@@ -99,6 +99,22 @@ if database_url:
     DATABASES["default"] = dj_database_url.parse(database_url)
     print(f"✅ Using Database: {DATABASES['default']['ENGINE']}")
 else:
+    print("⚠️  Using Default SQLite Database.")
+    print("DEBUG: Environment Variables Keys:", list(os.environ.keys()))
+    
+    # Fallback for individual Supabase Credentials if full URL is missing
+    if os.environ.get("POSTGRES_HOST"):
+        print("ℹ️  Found Partial Postgres Credentials. Constructing URL...")
+        DATABASES["default"] = {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ.get("POSTGRES_DATABASE", "postgres"),
+            'USER': os.environ.get("POSTGRES_USER", "postgres"),
+            'PASSWORD': os.environ.get("POSTGRES_PASSWORD", ""),
+            'HOST': os.environ.get("POSTGRES_HOST", ""),
+            'PORT': os.environ.get("POSTGRES_PORT", "5432"),
+        }
+
+else:
     print("⚠️  Using Default SQLite Database (Not suitable for Vercel)")
 
 

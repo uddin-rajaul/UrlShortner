@@ -1,11 +1,15 @@
 from django.contrib import admin
-from django.urls import path
-from django.urls.conf import include
+from django.urls import path, include
+from urlShortner.views import redirect_to_original
 
-from urlShortner.views import RedirectLink
+from django.http import HttpResponse
+
+def empty_favicon(request):
+    return HttpResponse(status=204)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('favicon.ico', empty_favicon),
     path('', include('urlShortner.urls')),
-    path('<slug:short_url>/', RedirectLink.as_view(), name='redirect_link')
+    path('<str:short_code>/', redirect_to_original, name='redirect'),
 ]

@@ -1,29 +1,27 @@
 from django.db import models
-from random import choices
-from string import ascii_letters
-from django.conf import settings
+from django.contrib.auth.models import User
+import string
+import random
 
-# Create your models here.
-class Urlshortner(models.Model):
+def generate_short_code():
+    length = 6
+    chars = string.ascii_letters + string.digits
+    while True:
+        code = ''.join(random.choices(chars, k=length))
+        if not ShortURL.objects.filter(short_code=code).exists():
+            return code
+
+class ShortURL(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='short_urls')
     original_url = models.URLField()
-    short_url = models.URLField(blank=True, null=True)
+    short_code = models.CharField(max_length=15, unique=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    click_count = models.IntegerField(default=0)
 
-    def shortner(self):
-        while True:
-            random_strings = ''.join(choices(ascii_letters, k=6))
-            new_link = settings.HOST_URL+"/"+random_strings
-            if not Urlshortner.objects.filter(short_url=new_link).exists():
-                break
-        
-        return new_link
-    
     def save(self, *args, **kwargs):
-        if not self.short_url:
-            new_link = self.shortner()
-            self.short_url = new_link
-            
+        if not self.short_code:
+            self.short_code = generate_short_code()
+        super().save(*args, **kwargs)
 
-        return super().save(*args, **kwargs)
-    
-    def __str__(self) -> str:
-        return self.original_url
+    def __str__(self):
+        return f"{self.original_url} -> {self.short_code}"

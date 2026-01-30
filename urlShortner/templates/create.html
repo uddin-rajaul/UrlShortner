@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="flex items-center justify-center min-h-[60vh] py-10">
+    <div class="max-w-xl w-full bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
+        <h2 class="text-3xl font-bold mb-2 text-center text-gray-900 dark:text-white">Create Short URL</h2>
+        <p class="text-gray-500 dark:text-gray-400 text-center mb-8">Paste your long link to shorten it</p>
+        
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            <div>
+                <label for="original_url" class="font-medium text-gray-700 dark:text-gray-300 text-sm pl-1 block mb-1">Original URL</label>
+                <input type="url" name="original_url" id="original_url" required
+                    placeholder="https://example.com/very-long-url-that-needs-shortening"
+                    class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-indigo-500 focus:ring-0 outline-none transition-all shadow-sm placeholder-gray-400 dark:placeholder-gray-500">
+            </div>
+            
+            <div>
+                <label for="custom_code" class="font-medium text-gray-700 dark:text-gray-300 text-sm pl-1 block mb-1">
+                    Custom Short Code <span class="text-gray-400 font-normal">(Optional)</span>
+                </label>
+                <div class="relative">
+                    <span class="absolute left-4 top-3 text-gray-400 dark:text-gray-500 font-medium tracking-wider select-none">{{ request.get_host }}/</span>
+                    <input type="text" name="custom_code" id="custom_code"
+                        placeholder="my-link"
+                        class="w-full pl-36 sm:pl-48 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-indigo-500 focus:ring-0 outline-none transition-all shadow-sm placeholder-gray-400 dark:placeholder-gray-500">
+                </div>
+                 {% if error %}
+                 <p class="text-red-500 text-xs pl-1 mt-2 flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                    {{ error }}
+                 </p>
+                 {% endif %}
+            </div>
+            
+            <button type="submit" class="w-full bg-indigo-600 dark:bg-indigo-500 text-white py-4 rounded-xl font-bold hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors shadow-md hover:shadow-lg mt-4 flex justify-center items-center gap-2 group">
+                Shorten URL
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+            </button>
+        </form>
+    </div>
+</div>
+
+<style>
+    /* Handled by Tailwind classes but ensuring input reset */
+    input:focus {
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+</style>
+{% endblock %}
